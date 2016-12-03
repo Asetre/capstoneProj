@@ -16,40 +16,47 @@
 	<main>
 		<div class="row">
 			<div class="col-md-12">
-				<div class="info-container">
+				<div class="info-container container">
 			<div class="header-container">
 				<h1>Calculate the cost of driving</h1>
-				<p>Ever wonder how much that trip to work costs?</p>
-				<p>Just Fill out the form and see an estimate on the cost of gas it takes to drive there!</p>
-			</div>
+				<div class="container">
+					<p>Ever wonder how much that trip to work costs?</p>
+					<p>Just Fill out the form and see an estimate on the cost of gas it takes to drive there!</p>
 
-			<div forms-container>
+
+					<div forms-container>
 				<form id="myForm">
-					<div class="start-end-container">
+					<div class="start-end-container container">
+						<label>Starting Location</label>
 						<input id="pac-input" class="search-box" type="text" placeholder="Point A">
+						<label>Destination</label>
 						<input id="pac-input2" class="search-box" type="text" placeholder="Point B">
 					</div>
 
-					<button id="imperial-option">Imperial</button>
+					<p>Not sure what to fill in?</p>
+					<p>The average mileage of cars is approximately 26 Miles per Gallon<br> or 9 Litres per 100 KM</p>
 
-					<button id="metric-option">Metric</button>
+					<div class="container options-container">
+						<button id="imperial-option" class="btn btn-info">Imperial</button>
+
+						<button id="metric-option" class="btn btn-info">Metric</button>
+					</div>
 
 					<div class="price-container"></div>
-					<button type="submit" class="submit-button">Calculate</button>
+					<button type="submit" class="submit-button btn btn-success">Calculate</button>
+
+					<button class="reset btn btn-warning">Reset</button>
+					
+					<h2 class="cost"></h2>
 				</form>
 			</div>
+				</div>
+			</div>
+
 		</div>
 
 		<div class="map-container">
 			<div id="map"></div>
-		</div>
-
-		<div class="output-container">
-			<h2 class="cost"></h2>
-			
-			<button class="reset">Reset</button>
-		</div>
-			</div>
 		</div>
 
 	</main>
