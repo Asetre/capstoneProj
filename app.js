@@ -64,16 +64,27 @@ function calculateCost(distance) {
         var efficiency = $('.miles-gallon').val() * 0.425144;
         var km = distance * 0.001;
         var cost = (km / 100 * efficiency * costPerLitre).toFixed(2);
-        $('.cost').html(cost)
+        checkOptions(cost);
 
     } else {
         var costPerLitre = $('.cost-litre').val();
         var efficiency = $('.litre-100km').val();
         var km = distance * 0.001;
         var cost = (km / 100 * efficiency * costPerLitre).toFixed(2);
-        $('.cost').html(cost);
+        checkOptions(cost);
     }
-    $('.output-container').show();
+}
+
+function checkOptions(cost) {
+    var testifNaN = isNaN(cost)
+    if(testifNaN) {
+            var errHTML = '<div><h4>Missing Information: Check Imperial or Metric.</h4>';
+            $('.cost').html(errHTML);
+        } else {
+           var costHTML = '<h2 class="cost-header">$ ' + cost + '</h2>';
+           $('.cost').html(costHTML);
+            
+        }
 }
 
 function renderImperial() {

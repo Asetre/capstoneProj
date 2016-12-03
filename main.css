@@ -39,6 +39,16 @@ input {
 	margin-bottom: 15px; 
 	display: block;
 }
+
+.line-decoration {
+	width: 500px;
+	height: 1px;
+	border: solid grey 1px;
+}
+
+.cost-header {
+	font-size: 1.5em;
+}
 .map-container {
 	float: right;
 }
