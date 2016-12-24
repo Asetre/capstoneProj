@@ -67,3 +67,14 @@ input {
 .row {
 	width: 100%;
 }
+
+#states-js {
+	display: none;	
+	margin-top: 15px;
+	margin-bottom: 5px;
+}
+
+.vehicle-mileage-js {
+	display: none;	
+	
+}.

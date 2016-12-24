@@ -1,9 +1,18 @@
-
 $(document).ready(function() {
 
     var tripCalculator = {
 
+        regionCost: 1.31,
+
+        vehicleEfficiency: 9,
+
+        tripCost: null,
+
         distance: null,
+
+        stateGasPrices: null,
+
+        stateChoice: null,
 
     //Inputs
         //starting location input form
@@ -14,11 +23,16 @@ $(document).ready(function() {
         submitButton: $('.submit-button'),
         //Reset Form button
         resetButton: $('.reset'),
-        //calculate the distance
+        
+        unitedStatesButton: $('#metric-option'),
 
     //Starting Tasks
         init: function(){
+            //Create the map
             this.initMap();
+            //Load the gas prices from api
+            this.getStateGasPrices();
+
         },
 
     //Methods
@@ -36,9 +50,7 @@ $(document).ready(function() {
              var searchbox2 = new google.maps.places.SearchBox(input2);
         },
 
-        calcDistance: function(event){
-            event.preventDefault();
-
+        calcDistance: function(){
             var directionsService = new google.maps.DirectionsService;
             var directionsDisplay = new google.maps.DirectionsRenderer;
 
@@ -51,41 +63,95 @@ $(document).ready(function() {
             }, function(response, status) {
                 directionsDisplay.setDirections(response);
                 var distanceCalculated = response.routes[0].legs[0].distance.value;
-                this.distance =  distanceCalculated;
-
-                
+                tripCalculator.distance =  distanceCalculated;
             });
-            //Once distance is known, calculate the cost
-            this.calculateCost();
+
         },
 
-        calculateCost: function(){
-            console.log(this.distance);
-        }
+        calculateCost: function(event){
+            event.preventDefault();
+            tripCalculator.calcDistance();
+            //Gets the choice of state
+            tripCalculator.updateRegion();
+            //Waits for values to update
+            setTimeout(function() {
 
+		tripCalculator.convertToImperial();
+                var totalCost = ((tripCalculator.distance *.001) / 100 * tripCalculator.vehicleEfficiency * tripCalculator.regionCost).toFixed(2)
+                tripCalculator.tripCost = totalCost;
+		
+            },  50);
+            
+        },
 
+        getStateGasPrices: function() {
+            $.getJSON('https://quiet-atoll-70799.herokuapp.com/', function(info){
+                this.stateGasPrices = info;
+            }.bind(this));
+            
+        }, 
+
+        resetForm: function(event) {
+            event.preventDefault();
+            document.getElementById("myForm").reset();
+        },
+
+        updateRegion: function() {
+            tripCalculator.stateChoice = $('#states-js').val();
+        },
+
+    	renderUsOption: function(event) {
+    	    event.preventDefault();
+	    
+	    $('#states-js').toggle();
+	    $('.vehicle-mileage-js').toggle();
+    	
+        },
+
+	convertToImperial: function() {
+	    this.regionCost * 0.264172052; 
+	    
+
+	}
     }
 
-    // $('.reset').on('click', function() {
-    //     document.getElementById("myForm").reset();
-    // });
+    //Initialize the map
+    tripCalculator.init();
+
+    //Wait for ajax request to api
+    setTimeout(function() {
+        //Event listeners
+        tripCalculator.resetButton.on('click', tripCalculator.resetForm);
+        tripCalculator.submitButton.on('click', tripCalculator.calculateCost);
+        tripCalculator.unitedStatesButton.on('click', tripCalculator.renderUsOption);
+	
+    }, 80);
 
 
-    // // Imperial and metric Toggle
-    // $('#imperial-option').click(function(event) {
-    //     event.preventDefault();
-    //     renderImperial();
-    // });
-
-    // $('#metric-option').click(function(event) {
-    //     event.preventDefault();
-    //     renderMetric();
-    // });
-
-
-tripCalculator.init();
-tripCalculator.submitButton.on('click', tripCalculator.calcDistance);
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// tripCalculator.resetButton.on('click', )
 
 
 // function calculateCost(distance) {
@@ -134,15 +200,6 @@ tripCalculator.submitButton.on('click', tripCalculator.calcDistance);
 // }
 
 
-
-
-// ///////////////////////
-
-
-
-// $.getJSON('https://quiet-atoll-70799.herokuapp.com/Oklahoma', function(info){
-//     console.log(info);
-// })
 
 
 
