@@ -37,11 +37,44 @@
 							<p>The average mileage of cars is approximately 26 Miles per Gallon<br> or 9 Litres per 100 KM</p> -->
 
 							<div class="container options-container">
-								<button id="imperial-option" class="btn btn-info">Canada</button>
+								<button id="imperial-option" class="btn btn-info">United States</button>
 
-								<button id="metric-option" class="btn btn-info">United States</button>
+								<button id="metric-option" class="btn btn-info">Canada</button>
+								
 
-								<div>
+								<div id="can-options-js">
+
+										<label>Choose your province: </label>
+
+									<select id="provinces-js">
+										<option value="Alberta">Alberta</option>
+										<option value="British Columbia">British Columbia</option>
+										<option value="Manitoba">Manitoba</option>
+										<option value="New Brunswick">New Brunswick</option>
+										<option value="Newfoundland">Newfoundland</option>
+										<option value="Nova Scotia">Nova Scotia</option>
+										<option value="Northwest Territories">Northwest Territories</option>
+										<option value="Nunavut">Nunavut</option>
+										<option value="Ontario">Ontario</option>
+										<option value="PEI">Prince Edward Island</option>
+										<option value="Quebec">Quebec</option>
+										<option value="Saskatchewan">Saskatchewan</option>
+									</select>
+
+									<div class="vehicle-litres-per-km-js"> 
+										<label>Vehicle Mileage</label>
+										<input id="litres-per-km-js"  type="text" placeholder="Litres per 100km">	
+								
+									</div>
+								</div>
+
+
+
+
+								
+								<div id="us-options-js">
+
+									<label>Choose your state: </label>
 									<select id="states-js">
 										<option value="Alabama">Alabama</option>'
 										<option value="Alaska">Alaska</option>' 
@@ -91,24 +124,24 @@
 										<option value="West Virginia">West Virginia</option>
 										<option value="Wisconsin">Wisconsin</option>
 										<option value="Wyoming">Wyoming</option>
-								    </select>
+									  </select>
+
+								        
+									<div class="vehicle-mileage-js"> 
+										<label>Vehicle Mileage</label>
+										<input id="miles-per-gallon"  type="text" placeholder="Miles/Gallon">	
+								
+									</div>
 								</div>
 							</div>
 
-							<div class="vehicle-mileage-js"> 
-						     		<label>Vehicle Mileage</label>
-								<input id="miles-per-gallon"  type="text" placeholder="Miles/Gallon">	
-						
-							</div>
 
-							<div class="price-container"></div>
 							<button type="submit" class="submit-button btn btn-success">Calculate</button>
 
 							<button class="reset btn btn-warning">Reset</button>
 
 							<div class="line-decoration"></div>
-
-							<h2 class="cost"></h2>
+							<div class="cost-container"></div>
 						</form>
 					</div>
 				</div>

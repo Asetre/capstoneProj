@@ -68,13 +68,18 @@ input {
 	width: 100%;
 }
 
-#states-js {
-	display: none;	
+#us-options-js {
+
+	display: none;
 	margin-top: 15px;
-	margin-bottom: 5px;
 }
 
-.vehicle-mileage-js {
-	display: none;	
-	
-}.
+#can-options-js {
+	display: none;
+	margin-top: 15px;
+}
+
+.cost-container {
+	width: 30%;
+
+}
