@@ -104,7 +104,7 @@ function calculateCost(event) {
 
 function clearForms(event) {
    event.preventDefault();
-    document.getElementById("myForm").reset();
+   document.getElementById("myForm").reset();
 }
 
 function getRegionPrice() {
