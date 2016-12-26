@@ -127,7 +127,7 @@ function getRegionPrice() {
 }
 
 function renderCost() {
-	costToHTML = '<h3>The estimated cost of your trip is: </h3>' +  '<h2>' + costOfTrip + '</h2>';
+	costToHTML = '<h3>The estimated cost of your trip is: </h3>' +  '<h2>$' + costOfTrip + '</h2>';
 
 	$('.cost-container').html(costToHTML);
 
