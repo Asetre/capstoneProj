@@ -9,6 +9,8 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
 	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDsIljx-RAmmjUcvwI5YsQtzZiRAtWQokU&libraries=places"
   type="text/javascript"></script>
+	<script src="xml2json.js">
+	</script>
   	<script src="app.js"></script>
 </head>
 <body>
@@ -29,9 +31,12 @@
 						<form id="myForm">
 							<div class="start-end-container container">
 								<label>Starting Location</label>
-								<input id="pac-input" class="search-box" type="text" placeholder="Point A">
+								<input id="pac-input" class="search-box" type="text" placeholder="Point A" required>
 								<label>Destination</label>
-								<input id="pac-input2" class="search-box" type="text" placeholder="Point B">
+								<input id="pac-input2" class="search-box" type="text" placeholder="Point B" required>
+								<input id="car-make" type="text" placeholder="vehicle make" required>
+								<input id="car-model" type="text" placeholder="vehicle model" required>
+								<input id="car-year" type="text" placeholder="vehicle year" required>
 							</div>
 
 							<!-- <p>Not sure what to fill in?</p>
@@ -61,12 +66,6 @@
 										<option value="Quebec">Quebec</option>
 										<option value="Saskatchewan">Saskatchewan</option>
 									</select>
-
-									<div class="vehicle-litres-per-km-js">
-										<label>Vehicle Mileage</label>
-										<input id="litres-per-km-js"  type="text" placeholder="Litres per 100km">
-
-									</div>
 								</div>
 
 								<div id="us-options-js">
@@ -123,11 +122,6 @@
 										<option value="Wyoming">Wyoming</option>
 									  </select>
 
-									<div class="vehicle-mileage-js">
-										<label>Vehicle Mileage</label>
-										<input id="miles-per-gallon"  type="text" placeholder="Miles/Gallon">
-
-									</div>
 								</div>
 							</div>
 
