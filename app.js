@@ -1,11 +1,11 @@
 $(document).ready(function() {
-    retrieveGasApi();
+    retrieveGasApi(loadPage);
     initMap();
 //Event Listeners
     $('#imperial-option').on('click', unitedStatesToggle);
     $('#metric-option').on('click', canadaToggle);
     $('.submit-button').on('click', calculateCost);
-    $('.reset').on('click', clearForms); 
+    $('.reset').on('click', clearForms);
 });
 
 var costOfTrip;
@@ -15,15 +15,24 @@ var unitedStatesPrices;
 var canadaPrices;
 var distance;
 
-function retrieveGasApi() {
-    $.getJSON('https://quiet-atoll-70799.herokuapp.com/USA', function(information) {
-	unitedStatesPrices = information;
+//Remove the loading screen
+function loadPage() {
+}
+
+//Make AJAX request for prices
+function retrieveGasApi(cb) {
+  //cb argument is a callback
+  //Get gas prices for US
+  $.getJSON('https://quiet-atoll-70799.herokuapp.com/USA', function(information) {
+    unitedStatesPrices = information;
+    //Get gas prices for Canada
+    $.getJSON('https://quiet-atoll-70799.herokuapp.com/CAN', function(information) {
+      canadaPrices = information;
+      //Wait for async code to load before running callback
+      cb()
     });
+  });
 
-	$.getJSON('https://quiet-atoll-70799.herokuapp.com/CAN', function(information) {
-		canadaPrices = information;	
-
-	});
 }
 
 function initMap() {
@@ -85,15 +94,15 @@ function calculateCost(event) {
 		if( $('#us-options-js').is(":visible") && $('#can-options-js:hidden')) {
 			var vehicleMileage = $('#miles-per-gallon').val();
 			var distanceInMiles = distance * 0.000621371;
-			
+
 			costOfTrip = (distanceInMiles / vehicleMileage * regionPrice).toFixed(2);
-		 
-		
+
+
 		} else if($('#can-options-js').is(":visible") && $('#us-options-js:hidden')) {
 			var vehicleMileage = $('#litres-per-km-js').val();
 			var distanceInKm = distance * .001;
 			costOfTrip = (distanceInKm / 100 * vehicleMileage * regionPrice).toFixed(2);
-			
+
 		}
 
 		renderCost();
@@ -114,7 +123,7 @@ function getRegionPrice() {
 			if(regionChoice === keys) {
 				regionPrice  = unitedStatesPrices[keys];
 			}
-		}  
+		}
 	} else if($('#can-options-js').is(":visible") && $('#us-options-js:hidden')) {
 		regionChoice = $('#provinces-js').val();
 		for(keys in canadaPrices) {
@@ -132,6 +141,3 @@ function renderCost() {
 	$('.cost-container').html(costToHTML);
 
 }
-
-
-

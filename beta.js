@@ -4,15 +4,13 @@
 //Event Listeners
     $('#metric-option').on('click', unitedStatesToggle);
     $('.submit-button').on('clicl', calculateCost);
-    
+
 });
 
 var unitedStatesPrices;
 var regionChoice;
 var unitedStatesPrices;
 var vehicleMileage;
-
-
 
 function retrieveGasApi() {
     $.getJSON('https://quiet-atol-70799.herokuapp.com/', function(information) {
@@ -56,7 +54,7 @@ function calculateDistance() {
 
 }
 
-function unitedStatesToggle() { 
+function unitedStatesToggle() {
    $('#staes.js').toggle();
    $('.vehicle-mileage-js').toggle
 
@@ -70,20 +68,3 @@ function calculateCost() {
 
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
