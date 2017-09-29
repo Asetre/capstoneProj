@@ -1,6 +1,5 @@
 $(document).ready(function() {
-    retrieveGasApi(loadPage);
-    initMap();
+    retrieveGasApi(initMap(loadPage));
 //Event Listeners
     $('#imperial-option').on('click', unitedStatesToggle);
     $('#metric-option').on('click', canadaToggle);
@@ -17,6 +16,8 @@ var distance;
 
 //Remove the loading screen
 function loadPage() {
+  $('.main-content').removeClass('blur')
+  $('.loading').hide()
 }
 
 //Make AJAX request for prices
@@ -35,8 +36,9 @@ function retrieveGasApi(cb) {
 
 }
 
-function initMap() {
-
+//Initialize google maps
+var initMap = function(cb) {
+  //cb is a callback
     map = new google.maps.Map(document.getElementById('map'), {
 	    center: {lat: 46.392410, lng: -94.636230},
 	    zoom: 4
@@ -46,7 +48,7 @@ function initMap() {
     var input2 = document.getElementById('pac-input2');
     var searchbox1 = new google.maps.places.SearchBox(input1);
     var searchbox2 = new google.maps.places.SearchBox(input2);
-
+    cb()
 }
 
 function calculateDistance() {
