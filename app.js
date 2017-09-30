@@ -8,18 +8,22 @@ var info ={
   distance: 0,
   price: 0,
   mileage: 0,
+  year: 0,
   costUs: function() {
     //convert km to miles
 		var distanceMiles = this.distance * 0.000621371;
-    return (distanceMiles / this.mileage * this.Price).toFixed(2)
+    console.log(typeof Number(this.mileage), typeof distanceMiles, typeof this.price)
+    return (distanceMiles / Number(this.mileage) * this.price).toFixed(2)
   },
   costCa: function() {
 //			var distanceInKm = distance * .001;
 //			costOfTrip = (distanceInKm / 100 * vehicleMileage * regionPrice).toFixed(2);
     var distanceKm = this.distance * .001
-    return (distanceKm / 100 * this.mileage * price).toFixed(2)
+    return (distanceKm / 100 * Number(this.mileage) * this.price).toFixed(2)
+  },
+  convertMileage: function() {
+    this.mileage = 235.215 / this.mileage
   }
-
 }
 //Make ajax request to get prices
 function getPrices(cb) {
@@ -44,8 +48,8 @@ function initMap() {
     zoom: 4
   });
   //get input elements
-  var input1 = document.getElementById('pac-input')
-  var input2 = document.getElementById('pac-input2')
+  var input1 = document.getElementById('start-loc')
+  var input2 = document.getElementById('dest-loc')
   //set google maps autocomplete
   var searchbox1 = new google.maps.places.SearchBox(input1)
   var searchbox2 = new google.maps.places.SearchBox(input2)
@@ -56,55 +60,55 @@ function initMap() {
 //Make page viewable
 function loadPage() {
   //remove blur on page
-  $('.main-content').removeClass('blur')
-  //remove loading circle
+  $('.main').removeClass('blur')
+  //remove loading circle and message
   $('.loading').hide()
+  $('.loading-msg').hide()
 }
 
 //Toggle html elements
 function unitedStatesToggle(event) {
   event.preventDefault()
-  $('#us-options-js').toggle()
-  $('#can-options-js').hide()
+  $('#states-js').toggle()
+  $('#provinces-js').hide()
 
 }
 
 //Toggle html elements
 function canadaToggle(event) {
   event.preventDefault();
-  $('#can-options-js').toggle()
-  $('#us-options-js').hide()
+  $('#provinces-js').toggle()
+  $('#states-js').hide()
 
-}
-
-//Clear form elements
-function clearForms(event) {
-   event.preventDefault();
-   document.getElementById("myForm").reset();
 }
 
 function renderHtml() {
-  console.log(info)
-	//var = costToHTML = '<h3>The estimated cost of your trip is: </h3>' +  '<h2>$' + costOfTrip + '</h2>';
-//
-	//$('.cost-container').html(costToHTML);
+  let cost;
+	if( $('#states-js').is(":visible") && $('#provinces-js')) {
+    cost = info.costUs()
+  }else if($('#provinces-js').is(':visible') && $('#states-js')) {
+    cost = info.costCa()
+  }
+  let costHTML = "<h2>The estimated cost is: " + "$" + cost + "</h2>"
+  $('.cost-container').append(costHTML)
 }
 
 function getRegionPrice() {
+  //Match the state/province of choice to cost
   //If user chooses us
-	if( $('#us-options-js').is(":visible") && $('#can-options-js:hidden')) {
-		regionChoice = $('#states-js').val();
-		for(keys in unitedStatesPrices) {
+	if( $('#states-js').is(":visible") && $('#provinces-js')) {
+		var regionChoice = $('#states-js').val();
+		for(keys in prices.usa) {
 			if(regionChoice === keys) {
-				info.price  = unitedStatesPrices[keys];
+				info.price  = prices.usa[keys];
 			}
 		}
   //if user chooses ca
-	} else if($('#can-options-js').is(":visible") && $('#us-options-js:hidden')) {
-		regionChoice = $('#provinces-js').val();
-		for(keys in canadaPrices) {
+} else if($('#provinces-js').is(":visible") && $('#states-js')) {
+		var regionChoice = $('#provinces-js').val();
+		for(keys in prices.can) {
 			if(regionChoice === keys) {
-				info.price = canadaPrices[keys] * .01;
+				info.price = prices.can[keys] * .01;
 			}
 		}
 	}
@@ -112,11 +116,39 @@ function getRegionPrice() {
   getMileage(renderHtml)
 }
 
+function handleXML(err, xml, cb) {
+  if(err) return alert(err)
+  //convert xml into json
+  let jsonRaw = xml2json(xml, "")
+  try {
+    let vehicles = JSON.parse(jsonRaw).vehicles.vehicle
+    let cars = vehicles
+
+    //find the car with matching year
+    for(key in cars) {
+      if(cars[key].year === info.year) {
+        info.mileage = cars[key].comb08
+        break
+      }
+    }
+  }catch(err) {
+    console.log(err)
+      alert('Sorry, we could not find you vehicle. We have used an average vehicle mileage')
+      info.mileage = 26.2
+  }
+  //execute callback
+  cb()
+}
+
 function getMileage(cb) {
   //cb is a callback
-  var make = 'honda'
-  var model = 'civic'
-  var year = '2007'
+  var make = $('#car-make').val()
+  var model = $('#car-model').val()
+  info.year = $('#car-year').val()
+
+  //remove whitespace
+  make = make.replace(' ', '')
+  model = model.replace(' ', '')
 
   //make ajax request to get xml data for vehicle
   $.ajax({
@@ -124,27 +156,13 @@ function getMileage(cb) {
     dataType: 'xml',
     crossDomain: true,
     success: function(xml) {
-      //convert xml into json
-      let jsonRaw = xml2json(xml, "")
-      let vehicles = JSON.parse(jsonRaw).vehicles.vehicle
-      let cars = vehicles
-
-      //find the car with matching year
-      for(key in cars) {
-        if(cars[key].year === year) {
-          info.mileage = cars[key].comb08
-          break
-        }
-      }
-      //execute callback
-      cb()
+      handleXML(null, xml, cb)
     },
     error: function(err) {
-      console.log(err)
+      handleXML(err, null, cb)
     }
   })
 }
-
 
 function calculateCost(e) {
   e.preventDefault()
@@ -161,8 +179,8 @@ function calculateDistance(cb) {
 
   //Find the distance between points
   directionsService.route({
-    origin: $('#pac-input').val(),
-    destination: $('#pac-input2').val(),
+    origin: $('#start-loc').val(),
+    destination: $('#dest-loc').val(),
     travelMode: 'DRIVING'
   }, function(response, status) {
     if (status === 'OK') {
@@ -185,136 +203,8 @@ $(document).ready(function() {
   getPrices(initMap)
 
   //Event Listeners
-  $('#imperial-option').on('click', unitedStatesToggle);
-  $('#metric-option').on('click', canadaToggle);
-  $('.submit-button').on('click', calculateCost);
-  $('.reset').on('click', clearForms);
+  $('.btn-us-opt').on('click', unitedStatesToggle);
+  $('.btn-can-opt').on('click', canadaToggle);
+  $('.btn-calc').on('click', calculateCost);
 
-
-  (function getMileage(cb) {
-  })()
 })
-
-
-//$(document).ready(function() {
-//    retrieveGasApi(initMap(loadPage));
-//});
-//
-//var costOfTrip;
-//var regionChoice;
-//var regionPrice;
-//var unitedStatesPrices;
-//var canadaPrices;
-//var distance;
-//
-////Remove the loading screen
-//function loadPage() {
-//  $('.main-content').removeClass('blur')
-//  $('.loading').hide()
-//}
-//
-////Make AJAX request for prices
-//function retrieveGasApi(cb) {
-//  //cb argument is a callback
-//  //Get gas prices for US
-//  $.getJSON('https://quiet-atoll-70799.herokuapp.com/USA', function(information) {
-//    unitedStatesPrices = information;
-//    //Get gas prices for Canada
-//    $.getJSON('https://quiet-atoll-70799.herokuapp.com/CAN', function(information) {
-//      canadaPrices = information;
-//      //Wait for async code to load before running callback
-//      cb()
-//    });
-//  });
-//
-//}
-//
-////Initialize google maps
-//var initMap = function(cb) {
-//  //cb is a callback
-//    //set the map with default location
-//    map = new google.maps.Map(document.getElementById('map'), {
-//	    center: {lat: 46.392410, lng: -94.636230},
-//	    zoom: 4
-//    });
-//
-//    //get inputs
-//    var input1 = document.getElementById('pac-input');
-//    var input2 = document.getElementById('pac-input2');
-//    //set google maps autocomplete
-//    var searchbox1 = new google.maps.places.SearchBox(input1);
-//    var searchbox2 = new google.maps.places.SearchBox(input2);
-//    //run callback
-//    cb()
-//}
-//
-////Calculate the total distance
-//function calculateDistance() {
-//    //google maps map drawing
-//    var directionsService = new google.maps.DirectionsService;
-//    var directionsDisplay = new google.maps.DirectionsRenderer;
-//
-//    directionsDisplay.setMap(map);
-//
-//  //Find the distance between points
-//  directionsService.route({
-//	origin: $('#pac-input').val(),
-//	destination: $('#pac-input2').val(),
-//	travelMode: 'DRIVING'
-//    }, function(response, status) {
-//	if (status === 'OK') {
-//      //if successful get info and draw map
-//	    directionsDisplay.setDirections(response);
-//	    var distanceCalculated = response.routes[0].legs[0].distance.value;
-//	    distance = distanceCalculated;
-//      //run callback
-//      getRegionPrice()
-//	} else {
-//	    console.log('Directions request failed due to ' + status);
-//	}
-//    });
-//
-//}
-//
-//
-//function calculateCost(event) {
-//    event.preventDefault();
-//    calculateDistance();
-//		if( $('#us-options-js').is(":visible") && $('#can-options-js:hidden')) {
-//			var vehicleMileage = $('#miles-per-gallon').val();
-//			var distanceInMiles = distance * 0.000621371;
-//
-//			costOfTrip = (distanceInMiles / vehicleMileage * regionPrice).toFixed(2);
-//
-//
-//		} else if($('#can-options-js').is(":visible") && $('#us-options-js:hidden')) {
-//			var vehicleMileage = $('#litres-per-km-js').val();
-//			var distanceInKm = distance * .001;
-//			costOfTrip = (distanceInKm / 100 * vehicleMileage * regionPrice).toFixed(2);
-//
-//		}
-//		renderCost();
-//}
-//
-//
-//function getRegionPrice() {
-//	if( $('#us-options-js').is(":visible") && $('#can-options-js:hidden')) {
-//		regionChoice = $('#states-js').val();
-//		for(keys in unitedStatesPrices) {
-//			if(regionChoice === keys) {
-//				regionPrice  = unitedStatesPrices[keys];
-//			}
-//		}
-//	} else if($('#can-options-js').is(":visible") && $('#us-options-js:hidden')) {
-//		regionChoice = $('#provinces-js').val();
-//		for(keys in canadaPrices) {
-//			if(regionChoice === keys) {
-//				regionPrice = canadaPrices[keys] * .01;
-//			}
-//		}
-//	}
-//}
-//
-//function renderCost() {
-//
-//}
