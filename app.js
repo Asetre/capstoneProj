@@ -117,7 +117,10 @@ function getRegionPrice() {
 }
 
 function handleXML(err, xml, cb) {
-  if(err) return alert(err)
+  if(err) {
+     console.log(err)
+     alert('Sorry there was an error finding your vehicle please try again')
+  }
   //convert xml into json
   let jsonRaw = xml2json(xml, "")
   try {
