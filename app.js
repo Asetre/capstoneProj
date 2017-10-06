@@ -155,7 +155,7 @@ function getMileage(cb) {
 
   //make ajax request to get xml data for vehicle
   $.ajax({
-    url: 'http://www.fueleconomy.gov/ws/rest/ympg/shared/vehicles?make=' + make + '&model=' + model,
+    url: 'https://www.fueleconomy.gov/ws/rest/ympg/shared/vehicles?make=' + make + '&model=' + model,
     dataType: 'xml',
     crossDomain: true,
     success: function(xml) {
