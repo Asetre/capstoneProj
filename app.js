@@ -3,23 +3,24 @@ var prices = {
   can: null
 }
 
+var keys;
+
 //			costOfTrip = (distanceInMiles / vehicleMileage * regionPrice).toFixed(2);
 var info ={
   distance: 0,
   price: 0,
   mileage: 0,
   year: 0,
-  costUs: function() {
-    //convert km to miles
-		var distanceMiles = this.distance * 0.000621371;
-    console.log(typeof Number(this.mileage), typeof distanceMiles, typeof this.price)
-    return (distanceMiles / Number(this.mileage) * this.price).toFixed(2)
-  },
-  costCa: function() {
-//			var distanceInKm = distance * .001;
-//			costOfTrip = (distanceInKm / 100 * vehicleMileage * regionPrice).toFixed(2);
-    var distanceKm = this.distance * .001
-    return (distanceKm / 100 * Number(this.mileage) * this.price).toFixed(2)
+  type: null,
+  findCost: function() {
+    if(this.type == 'us') {
+      var distanceMiles = this.distance * 0.000621371;
+      this.convertMileage()
+      return (distanceMiles / Number(this.mileage) * this.price).toFixed(2)
+    }else if(this.type == 'ca') {
+      var distanceKm = this.distance * .001
+      return (distanceKm / 100 * Number(this.mileage) * this.price).toFixed(2)
+    }
   },
   convertMileage: function() {
     this.mileage = 235.215 / this.mileage
@@ -53,17 +54,76 @@ function initMap() {
   //set google maps autocomplete
   var searchbox1 = new google.maps.places.SearchBox(input1)
   var searchbox2 = new google.maps.places.SearchBox(input2)
-  //Load the page
-  loadPage()
+
+  //change loading message
+  $('.loading-msg-map').hide()
+  $('.loading-msg-gas').show()
+
+  //Find the lat/long of user
+  if(navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(function(position) {
+      var pos = {
+        lat: position.coords.latitude,
+        lng: position.coords.longitude
+      }
+      //Reverse geocode convert lat/long to find the state/province
+      $.getJSON('https://maps.googleapis.com/maps/api/geocode/json?latlng='+pos.lat+','+pos.lng+'&key=AIzaSyCwDMcFn5UwfQgNzaPBzyaQ6VKNJzMLKcM', function(data) {
+        let addressComponents = data.results[0].address_components
+
+        for(let i=0; i<addressComponents.length; i++) {
+          matchRegion(addressComponents[i].long_name)
+        }
+
+        function matchRegion(arg) {
+          //Try to find state price
+          for(key in prices.usa) {
+            if(arg == key) {
+              info.type = 'us'
+              return info.price = prices.usa[key]
+            }
+          }
+          //State price was not found, find province price
+          if(!info.price){
+            for(key in prices.can) {
+              if(arg == key) {
+                info.type = 'ca'
+                return info.price = prices.can[key] * .01
+              }
+            }
+          }
+        }
+        loadPage(null)
+      })
+    }, function() {
+      //Error geolocating
+      console.log('Error: Geolocation service failed')
+      loadPage(true)
+    })
+  }else {
+    //Browser does not support geolocation
+    console.log('Browser does not support geolocation')
+    loadPage(true)
+  }
 }
 
 //Make page viewable
-function loadPage() {
+function loadPage(err) {
+  if(err || info.price == 0) {
+    alert('We were unable to find your location, please manually select below')
+    $('.location-not-found').show()
+    $('.btn-container').show(0, function() {
+        $(this).css({
+          'display': 'flex',
+          'flex-direction': 'row',
+          'justify-content': 'space-between'
+        })
+    })
+  }
   //remove blur on page
   $('.main').removeClass('blur')
   //remove loading circle and message
   $('.loading').hide()
-  $('.loading-msg').hide()
+  $('.loading-msg-gas').hide()
 }
 
 //Toggle html elements
@@ -83,43 +143,46 @@ function canadaToggle(event) {
 }
 
 function renderHtml() {
-  let cost;
-	if( $('#states-js').is(":visible") && $('#provinces-js')) {
-    cost = info.costUs()
-  }else if($('#provinces-js').is(':visible') && $('#states-js')) {
-    cost = info.costCa()
-  }
+  let cost = info.findCost()
   let costHTML = "<h2>The estimated cost is: " + "$" + cost + "</h2>"
+  $('.main').removeClass('blur')
+  $('.loading-msg-calc').hide()
+  $('.loading').hide()
+  $('.cost-container').empty()
   $('.cost-container').append(costHTML)
 }
 
 function getRegionPrice() {
-  //Match the state/province of choice to cost
-  //If user chooses us
-	if( $('#states-js').is(":visible") && $('#provinces-js')) {
-		var regionChoice = $('#states-js').val();
-		for(keys in prices.usa) {
-			if(regionChoice === keys) {
-				info.price  = prices.usa[keys];
-			}
-		}
-  //if user chooses ca
-} else if($('#provinces-js').is(":visible") && $('#states-js')) {
-		var regionChoice = $('#provinces-js').val();
-		for(keys in prices.can) {
-			if(regionChoice === keys) {
-				info.price = prices.can[keys] * .01;
-			}
-		}
-	}
+  if(info.price == 0) {
+    //Match the state/province of choice to cost
+    //If user chooses us
+    if( $('#states-js').is(":visible") && $('#provinces-js')) {
+      var regionChoice = $('#states-js').val();
+      for(keys in prices.usa) {
+        if(regionChoice === keys) {
+          info.type = 'us'
+          return info.price  = prices.usa[keys];
+        }
+      }
+      //if user chooses ca
+    } else if($('#provinces-js').is(":visible") && $('#states-js')) {
+      var regionChoice = $('#provinces-js').val();
+      for(keys in prices.can) {
+        if(regionChoice === keys) {
+          info.type = 'ca'
+          return info.price = prices.can[keys] * .01;
+        }
+      }
+    }
+  }
   //get the vehicle mileage
   getMileage(renderHtml)
 }
 
 function handleXML(err, xml, cb) {
   if(err) {
-     console.log(err)
-     alert('Sorry there was an error finding your vehicle please try again')
+    console.log(err)
+    alert('Sorry there was an error finding your vehicle please try again')
   }
   //convert xml into json
   let jsonRaw = xml2json(xml, "")
@@ -136,8 +199,8 @@ function handleXML(err, xml, cb) {
     }
   }catch(err) {
     console.log(err)
-      alert('Sorry, we could not find you vehicle. We have used an average vehicle mileage')
-      info.mileage = 26.2
+    alert('Sorry, we could not find you vehicle. We have used an average vehicle mileage')
+    info.mileage = 26.2
   }
   //execute callback
   cb()
@@ -169,6 +232,9 @@ function getMileage(cb) {
 
 function calculateCost(e) {
   e.preventDefault()
+  $('.main').addClass('blur')
+  $('.loading-msg-calc').show()
+  $('.loading').show()
   //get vehicle mileage info
   calculateDistance(getRegionPrice)
 }
@@ -197,6 +263,8 @@ function calculateDistance(cb) {
     } else {
       //Failed to get the distance
       console.log('Directions request failed due to ' + status);
+      alert('Failed to get directions')
+      location.reload()
     }
   });
 }
