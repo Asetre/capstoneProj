@@ -1,134 +1,129 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>
-		Trip Cost Calculator
-	</title>
+    <title>
+        Trip Cost Calculator
+    </title>
 
-	<link rel="stylesheet" type="text/css" href="simple-grid.min.css">
-	<link rel="stylesheet" type="text/css" href="main.css">
+    <link rel="stylesheet" type="text/css" href="simple-grid.min.css">
+    <link rel="stylesheet" type="text/css" href="main.css">
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
-	<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDsIljx-RAmmjUcvwI5YsQtzZiRAtWQokU&libraries=places"
-	type="text/javascript"></script>
-	<script src="xml2json.js">
-	</script>
-	<script src="app.js"></script>
+    <meta name="viewport" content="width=device-width", initial-scale=1>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDsIljx-RAmmjUcvwI5YsQtzZiRAtWQokU&libraries=places"
+    type="text/javascript"></script>
+    <script src="xml2json.js">
+    </script>
+    <script src="app.js"></script>
 </head>
 
 <body>
-	<h3 class="loading-msg-map">Loading map...</h3>
-	<h3 class="loading-msg-gas">Looking for your gas prices...</h3>
-	<h3 class="loading-msg-calc">Doing some calculations...</h3>
-	<section class="loading">
-	</section>
+    <h3 class="loading-msg-map">Loading map...</h3>
+    <h3 class="loading-msg-gas">Looking for your gas prices...</h3>
+    <h3 class="loading-msg-calc">Doing some calculations...</h3>
+    <section class="loading"></section>
 
-	<section class="main blur">
-		<div class="row">
-			<div class="col-4">
-				<div class="row">
-					<div class="col-12 test">
-						<div class="headers">
-							<h1>Trip Cost Calculator</h1>
-							<h5>Ever wonder how much that commute to work costs? Fill out the forms and find out!</h5>
-						</div>
+    <section class="main blur">
 
-						<form class="input-form" action="#">
-							<input id="start-loc" type="text" placeholder="Starting location" required>
-							<input id="dest-loc" type="text" placeholder="Destination" required>
-							<div class="vehicle-info">
-								<input id="car-make" type="text" placeholder="Vehicle Make" required>
-								<input id="car-model" type="text" placeholder="Vehicle Model" required>
-								<input id="car-year" type="number" placeholder="Vehicle Year" required>
-							</div>
-							<h6 class="location-not-found">We were unable to find your location, please select your state/province below</h5>
-							<div class="btn-container">
-								<button class="btn btn-us-opt" type="button">United States</button>
-								<button class="btn btn-can-opt" type="button">Canada</button>
-							</div>
-							<div class="select-container">
-								<select id="states-js">
-									<option value="Alabama">Alabama</option>'
-									<option value="Alaska">Alaska</option>'
-									<option value="Arizona">Arizona</option>'
-									<option value="Arkansas">Arkansas</option>'
-									<option value="California">California</option>'
-									<option value="Colorado">Colorado</option>'
-									<option value="Connecticut">Connecticut</option>'
-									<option value="Delaware">Delaware</option>'
-									<option value="Florida">Florida</option>
-									<option value="Georgia">Georgia</option>
-									<option value="Hawaii">Hawaii</option>
-									<option value="Idaho">Idaho</option>
-									<option value="Illinois">Illinois</option>
-									<option value="Indiana">Indiana</option>
-									<option value="Iowa">Iowa</option>
-									<option value="Kentucky">Kentucy</option>
-									<option value="Louisiana">Louisiana</option>
-									<option value="Maine">Maine</option>
-									<option value="Massachusetts">Massachusetts</option>
-									<option value="Michigan">Michigan</option>
-									<option value="Minnesota">Minnesota</option>
-									<option value="Mississippi">Mississippi</option>
-									<option value="Missouri">Missouri</option>
-									<option value="Montana">Montana</option>
-									<option value="Nebraska">Nebraska</option>
-									<option value="Nevada">Nevada</option>
-									<option value="New Hampshire">New Hampsire</option>
-									<option value="New Jersey">New Jersey</option>
-									<option value="New Mexico">New Mexico</option>
-									<option value="New York">New York</option>
-									<option value="North Carolina">North Carolina</option>
-									<option value="North Dakota">North Dakota</option>
-									<option value="Ohio">Ohio</option>
-									<option value="Oklahoma">Oklahoma</option>
-									<option value="Oregon">Oregon</option>
-									<option value="Pennsylvania">Pennsylvania</option>
-									<option value="Rhode Island">Rhode Island</option>
-									<option value="South Carolina">South Carolina</option>
-									<option value="South Dakota">South Dakota</option>
-									<option value="Tennessee">Tennessee</option>
-									<option value="Texas">Texas</option>
-									<option value="Utah">Utah</option>
-									<option value="Vermont">Vermont</option>
-									<option value="Virginia">Virginia</option>
-									<option value="Washington">Washington</option>
-									<option value="West Virginia">West Virginia</option>
-									<option value="Wisconsin">Wisconsin</option>
-									<option value="Wyoming">Wyoming</option>
-								</select>
+        <div class="left">
+            <div class="headers">
+                <h1>Trip Cost Calculator</h1>
+                <h5>Ever wonder how much that commute to work costs? Fill out the forms and find out!</h5>
+            </div>
+            <form class="input-form" action="#">
+                <input id="start-loc" type="text" placeholder="Starting location" required>
+                <input id="dest-loc" type="text" placeholder="Destination" required>
 
-								<select id="provinces-js">
-									<option value="Alberta">Alberta</option>
-									<option value="British Columbia">British Columbia</option>
-									<option value="Manitoba">Manitoba</option>
-									<option value="New Brunswick">New Brunswick</option>
-									<option value="Newfoundland">Newfoundland</option>
-									<option value="Nova Scotia">Nova Scotia</option>
-									<option value="Northwest Territories">Northwest Territories</option>
-									<option value="Nunavut">Nunavut</option>
-									<option value="Ontario">Ontario</option>
-									<option value="PEI">Prince Edward Island</option>
-									<option value="Quebec">Quebec</option>
-									<option value="Saskatchewan">Saskatchewan</option>
-								</select>
-							</div>
-							<button type="submit" class="btn btn-calc">Calculate</button>
-						</form>
-					</div>
-				</div>
-				<div class="row">
-					<div class="col-12">
-						<div class="cost-container"></div>
-					</div>
-				</div>
-			</div>
+                <div class="vehicle-info">
+                    <input id="car-make" type="text" placeholder="Vehicle Make" required>
+                    <input id="car-model" type="text" placeholder="Vehicle Model" required>
+                    <input id="car-year" type="number" placeholder="Vehicle Year" required>
+                </div>
 
-			<div class="col-8">
-				<div id="map"></div>
-			</div>
-		</div>
-	</section>
+                <h6 class="location-not-found hide">We were unable to find your location, please select your state/province below</h6>
+
+                <div class="btn-container hide">
+                    <button class="btn btn-us-opt" type="button">United States</button>
+                    <button class="btn btn-can-opt" type="button">Canada</button>
+                </div>
+                <div class="select-container hide">
+                    <select id="states-js" class="hide">
+                        <option value="Alabama">Alabama</option>'
+                        <option value="Alaska">Alaska</option>'
+                        <option value="Arizona">Arizona</option>'
+                        <option value="Arkansas">Arkansas</option>'
+                        <option value="California">California</option>'
+                        <option value="Colorado">Colorado</option>'
+                        <option value="Connecticut">Connecticut</option>'
+                        <option value="Delaware">Delaware</option>'
+                        <option value="Florida">Florida</option>
+                        <option value="Georgia">Georgia</option>
+                        <option value="Hawaii">Hawaii</option>
+                        <option value="Idaho">Idaho</option>
+                        <option value="Illinois">Illinois</option>
+                        <option value="Indiana">Indiana</option>
+                        <option value="Iowa">Iowa</option>
+                        <option value="Kentucky">Kentucy</option>
+                        <option value="Louisiana">Louisiana</option>
+                        <option value="Maine">Maine</option>
+                        <option value="Massachusetts">Massachusetts</option>
+                        <option value="Michigan">Michigan</option>
+                        <option value="Minnesota">Minnesota</option>
+                        <option value="Mississippi">Mississippi</option>
+                        <option value="Missouri">Missouri</option>
+                        <option value="Montana">Montana</option>
+                        <option value="Nebraska">Nebraska</option>
+                        <option value="Nevada">Nevada</option>
+                        <option value="New Hampshire">New Hampsire</option>
+                        <option value="New Jersey">New Jersey</option>
+                        <option value="New Mexico">New Mexico</option>
+                        <option value="New York">New York</option>
+                        <option value="North Carolina">North Carolina</option>
+                        <option value="North Dakota">North Dakota</option>
+                        <option value="Ohio">Ohio</option>
+                        <option value="Oklahoma">Oklahoma</option>
+                        <option value="Oregon">Oregon</option>
+                        <option value="Pennsylvania">Pennsylvania</option>
+                        <option value="Rhode Island">Rhode Island</option>
+                        <option value="South Carolina">South Carolina</option>
+                        <option value="South Dakota">South Dakota</option>
+                        <option value="Tennessee">Tennessee</option>
+                        <option value="Texas">Texas</option>
+                        <option value="Utah">Utah</option>
+                        <option value="Vermont">Vermont</option>
+                        <option value="Virginia">Virginia</option>
+                        <option value="Washington">Washington</option>
+                        <option value="West Virginia">West Virginia</option>
+                        <option value="Wisconsin">Wisconsin</option>
+                        <option value="Wyoming">Wyoming</option>
+                    </select>
+
+                    <select id="provinces-js" class="hide">
+                        <option value="Alberta">Alberta</option>
+                        <option value="British Columbia">British Columbia</option>
+                        <option value="Manitoba">Manitoba</option>
+                        <option value="New Brunswick">New Brunswick</option>
+                        <option value="Newfoundland">Newfoundland</option>
+                        <option value="Nova Scotia">Nova Scotia</option>
+                        <option value="Northwest Territories">Northwest Territories</option>
+                        <option value="Nunavut">Nunavut</option>
+                        <option value="Ontario">Ontario</option>
+                        <option value="PEI">Prince Edward Island</option>
+                        <option value="Quebec">Quebec</option>
+                        <option value="Saskatchewan">Saskatchewan</option>
+                    </select>
+                </div>
+                <input type="submit" class="btn btn-calc" value="Calculate"></input>
+            </form>
+            <div class="cost-container">
+
+            </div>
+        </div>
+
+        <div class="right">
+            <div id="map"></div>
+        </div>
+    </section>
 
 </body>
 </html>
